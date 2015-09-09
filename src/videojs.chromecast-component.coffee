@@ -23,7 +23,7 @@ class vjs.ChromecastComponent extends vjs.Button
     @initializeApi()
 
   initializeApi: ->
-    # Check if the browser is Google Chrome
+# Check if the browser is Google Chrome
     return unless vjs.IS_CHROME
 
     # If the Cast APIs arent available yet, retry in 1000ms
@@ -77,6 +77,20 @@ class vjs.ChromecastComponent extends vjs.Button
       if @player_.options_.poster
         image = new chrome.cast.Image(@player_.options_.poster)
         mediaInfo.metadata.images = [image]
+
+    if @settings.tracks
+      @tracks = [];
+      for key, value of @settings.tracks
+        @track = new chrome.cast.media.Track(1, chrome.cast.media.TrackType.TEXT);
+        @track.trackContentId = value.src;
+        @track.trackContentType = 'text/vtt';
+        @track.subtype = chrome.cast.media.TextTrackType.SUBTITLES;
+        @track.name = value.label;
+        @track.language = value.srclang;
+        @track.customData = null;
+        @tracks.push(@track);
+      mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle;
+      mediaInfo.tracks = @tracks;
 
     loadRequest = new chrome.cast.media.LoadRequest(mediaInfo)
     loadRequest.autoplay = true
@@ -189,11 +203,11 @@ class vjs.ChromecastComponent extends vjs.Button
   onError: ->
     vjs.log "error"
 
-  # Stops the casting on the Chromecast
+# Stops the casting on the Chromecast
   stopCasting: ->
     @apiSession.stop @onStopAppSuccess.bind(this), @onError
 
-  # Callback when the app has been successfully stopped
+# Callback when the app has been successfully stopped
   onStopAppSuccess: ->
     clearInterval @timer
     @casting = false
