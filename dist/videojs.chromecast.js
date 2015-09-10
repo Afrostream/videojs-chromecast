@@ -131,7 +131,7 @@
           this.track.subtype = value.kind;
           this.track.name = value.label;
           this.track.language = value.language;
-          if (this.track.track === 'showing') {
+          if (this.track.mode === 'showing') {
             this.selectedTrack = this.track;
           }
           this.track.customData = null;

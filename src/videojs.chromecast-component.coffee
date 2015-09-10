@@ -88,7 +88,7 @@ class vjs.ChromecastComponent extends vjs.Button
         @track.subtype = value.kind #chrome.cast.media.TextTrackType.CAPTIONS;
         @track.name = value.label;
         @track.language = value.language;
-        if @track.track is 'showing'
+        if @track.mode is 'showing'
           @selectedTrack = @track;
         @track.customData = null;
         @tracks.push(@track);
