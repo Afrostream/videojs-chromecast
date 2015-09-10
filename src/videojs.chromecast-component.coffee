@@ -95,8 +95,8 @@ class vjs.ChromecastComponent extends vjs.Button
 
       mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle()
       mediaInfo.tracks = @tracks;
-      vjs.on @player.textTracks(), 'change', @onTrackChangeHandler.bind(this);
-      @player.on 'dispose', vjs.off @player.textTracks(), 'change', @onTrackChangeHandler.bind(this);
+    #      vjs.on @player.textTracks(), 'change', @onTrackChangeHandler.bind(this);
+    #      @player.on 'dispose', vjs.off @player.textTracks(), 'change', @onTrackChangeHandler.bind(this);
 
 
     loadRequest = new chrome.cast.media.LoadRequest(mediaInfo)

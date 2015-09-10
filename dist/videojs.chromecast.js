@@ -139,8 +139,6 @@
         }
         mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle();
         mediaInfo.tracks = this.tracks;
-        vjs.on(this.player.textTracks(), 'change', this.onTrackChangeHandler.bind(this));
-        this.player.on('dispose', vjs.off(this.player.textTracks(), 'change', this.onTrackChangeHandler.bind(this)));
       }
       loadRequest = new chrome.cast.media.LoadRequest(mediaInfo);
       loadRequest.autoplay = true;
