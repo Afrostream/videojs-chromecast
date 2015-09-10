@@ -83,7 +83,7 @@ class vjs.ChromecastComponent extends vjs.Button
       @tracks = [];
       for key, value of @plTracks
         @track = new chrome.cast.media.Track(value.id, chrome.cast.media.TrackType.TEXT)
-        @track.trackContentId = value.id;
+        @track.trackContentId = value.src || value.id;
         @track.trackContentType = value.type; #'text/vtt';
         @track.subtype = value.kind #chrome.cast.media.TextTrackType.CAPTIONS;
         @track.name = value.label;

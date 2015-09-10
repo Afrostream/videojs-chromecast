@@ -126,7 +126,7 @@
         for (key in ref1) {
           value = ref1[key];
           this.track = new chrome.cast.media.Track(value.id, chrome.cast.media.TrackType.TEXT);
-          this.track.trackContentId = value.id;
+          this.track.trackContentId = value.src || value.id;
           this.track.trackContentType = value.type;
           this.track.subtype = value.kind;
           this.track.name = value.label;
