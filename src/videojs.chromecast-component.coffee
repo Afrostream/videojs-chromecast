@@ -22,6 +22,8 @@ class vjs.ChromecastComponent extends vjs.Button
     @hide()
     @initializeApi()
 
+    vjs.on player.textTracks(), 'change', @onTrackChangeHandler.bind(this)
+
   initializeApi: ->
 # Check if the browser is Google Chrome
     return unless vjs.IS_CHROME
@@ -78,11 +80,11 @@ class vjs.ChromecastComponent extends vjs.Button
         image = new chrome.cast.Image(@player_.options_.poster)
         mediaInfo.metadata.images = [image]
 
-    @plTracks = @player_.textTracks().tracks_;
+    @plTracks = @player_.textTracks().tracks_
     if @plTracks
       @tracks = [];
       for key, value of @plTracks
-        @track = new chrome.cast.media.Track(value.id, chrome.cast.media.TrackType.TEXT);
+        @track = new chrome.cast.media.Track(value.id, chrome.cast.media.TrackType.TEXT)
         @track.trackContentId = value.id;
         @track.trackContentType = value.type; #'text/vtt';
         @track.subtype = value.kind #chrome.cast.media.TextTrackType.CAPTIONS;
@@ -93,8 +95,10 @@ class vjs.ChromecastComponent extends vjs.Button
         @track.customData = null;
         @tracks.push(@track);
 
-      mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle();
+      mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle()
       mediaInfo.tracks = @tracks;
+      vjs.on @player.textTracks(), 'change', @onTrackChangeHandler.bind(this);
+      @player.on 'dispose', vjs.off @player.textTracks(), 'change', @onTrackChangeHandler.bind(this);
 
 
     loadRequest = new chrome.cast.media.LoadRequest(mediaInfo)
@@ -106,9 +110,9 @@ class vjs.ChromecastComponent extends vjs.Button
 
   onTrackChangeHandler: () ->
     @activeTrackIds = [];
-    for key, value of @player_.textTracks()
-      if value['mode'] is 'showing'
-        @activeTrackIds.push(value.id);
+    for track in @player_.textTracks()
+      if track['mode'] is 'showing'
+        @activeTrackIds.push(track.id);
 
     @tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest(@activeTrackIds);
 
@@ -133,7 +137,7 @@ class vjs.ChromecastComponent extends vjs.Button
 
     @startProgressTimer @incrementMediaTime.bind(this)
 
-    @player_.loadTech "ChromecastTech",
+    @player_.loadTech 'ChromecastTech',
       receiver: @apiSession.receiver.friendlyName
 
     @casting = true

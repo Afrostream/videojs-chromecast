@@ -54,6 +54,7 @@
       }
       this.hide();
       this.initializeApi();
+      vjs.on(player.textTracks(), 'change', this.onTrackChangeHandler.bind(this));
     }
 
     ChromecastComponent.prototype.initializeApi = function() {
@@ -139,6 +140,8 @@
         }
         mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle();
         mediaInfo.tracks = this.tracks;
+        vjs.on(this.player.textTracks(), 'change', this.onTrackChangeHandler.bind(this));
+        this.player.on('dispose', vjs.off(this.player.textTracks(), 'change', this.onTrackChangeHandler.bind(this)));
       }
       loadRequest = new chrome.cast.media.LoadRequest(mediaInfo);
       loadRequest.autoplay = true;
@@ -148,13 +151,13 @@
     };
 
     ChromecastComponent.prototype.onTrackChangeHandler = function() {
-      var key, ref, value;
+      var i, len, ref, track;
       this.activeTrackIds = [];
       ref = this.player_.textTracks();
-      for (key in ref) {
-        value = ref[key];
-        if (value['mode'] === 'showing') {
-          this.activeTrackIds.push(value.id);
+      for (i = 0, len = ref.length; i < len; i++) {
+        track = ref[i];
+        if (track['mode'] === 'showing') {
+          this.activeTrackIds.push(track.id);
         }
       }
       this.tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest(this.activeTrackIds);
@@ -180,7 +183,7 @@
       }
       this.apiMedia.editTracksInfo(this.tracksInfoRequest, this.onTrackSuccess.bind(this), this.onTrackError.bind(this));
       this.startProgressTimer(this.incrementMediaTime.bind(this));
-      this.player_.loadTech("ChromecastTech", {
+      this.player_.loadTech('ChromecastTech', {
         receiver: this.apiSession.receiver.friendlyName
       });
       this.casting = true;
