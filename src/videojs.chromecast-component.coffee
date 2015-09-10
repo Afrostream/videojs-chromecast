@@ -80,18 +80,20 @@ class vjs.ChromecastComponent extends vjs.Button
 
     @plTracks = @settings.tracks #@player_.textTracks().tracks_
     if @plTracks
-      @tracks = [];
+      @nbTrack = 1
+      @tracks = []
       for key, value of @plTracks
-        @track = new chrome.cast.media.Track(value.id, chrome.cast.media.TrackType.TEXT)
-        @track.trackContentId = value.src || value.id;
-        @track.trackContentType = value.type; #'text/vtt';
-        @track.subtype = value.kind #chrome.cast.media.TextTrackType.CAPTIONS;
-        @track.name = value.label;
-        @track.language = value.language;
+        @track = new chrome.cast.media.Track(@nbTrack, chrome.cast.media.TrackType.TEXT)
+        @track.trackContentId = value.src
+        @track.trackContentType = value.type #'text/vtt';
+        @track.subtype = chrome.cast.media.TextTrackType.CAPTIONS #value.kind #chrome.cast.media.TextTrackType.CAPTIONS;
+        @track.name = value.label
+        @track.language = value.language
         if value.mode is 'showing'
-          @selectedTrack = @track;
-        @track.customData = null;
-        @tracks.push(@track);
+          @selectedTrack = @track
+        @track.customData = null
+        @tracks.push(@track)
+        ++@nbTrack
 
       mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle()
       mediaInfo.tracks = @tracks;

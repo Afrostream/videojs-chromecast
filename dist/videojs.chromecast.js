@@ -121,14 +121,15 @@
       }
       this.plTracks = this.settings.tracks;
       if (this.plTracks) {
+        this.nbTrack = 1;
         this.tracks = [];
         ref1 = this.plTracks;
         for (key in ref1) {
           value = ref1[key];
-          this.track = new chrome.cast.media.Track(value.id, chrome.cast.media.TrackType.TEXT);
-          this.track.trackContentId = value.src || value.id;
+          this.track = new chrome.cast.media.Track(this.nbTrack, chrome.cast.media.TrackType.TEXT);
+          this.track.trackContentId = value.src;
           this.track.trackContentType = value.type;
-          this.track.subtype = value.kind;
+          this.track.subtype = chrome.cast.media.TextTrackType.CAPTIONS;
           this.track.name = value.label;
           this.track.language = value.language;
           if (value.mode === 'showing') {
@@ -136,6 +137,7 @@
           }
           this.track.customData = null;
           this.tracks.push(this.track);
+          ++this.nbTrack;
         }
         mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle();
         mediaInfo.tracks = this.tracks;
