@@ -132,7 +132,7 @@
           this.track.subtype = value.kind;
           this.track.name = value.label;
           this.track.language = value.language;
-          if (this.track.language === this.settings.metadata.defaultLanguage) {
+          if (this.track.track === 'showing') {
             this.selectedTrack = this.track;
           }
           this.track.customData = null;
