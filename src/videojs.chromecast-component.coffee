@@ -22,8 +22,6 @@ class vjs.ChromecastComponent extends vjs.Button
     @hide()
     @initializeApi()
 
-    vjs.on player.textTracks(), 'change', @onTrackChangeHandler.bind(this)
-
   initializeApi: ->
 # Check if the browser is Google Chrome
     return unless vjs.IS_CHROME
@@ -80,7 +78,7 @@ class vjs.ChromecastComponent extends vjs.Button
         image = new chrome.cast.Image(@player_.options_.poster)
         mediaInfo.metadata.images = [image]
 
-    @plTracks = @player_.textTracks().tracks_
+    @plTracks = @settings.tracks #@player_.textTracks().tracks_
     if @plTracks
       @tracks = [];
       for key, value of @plTracks

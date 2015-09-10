@@ -54,7 +54,6 @@
       }
       this.hide();
       this.initializeApi();
-      vjs.on(player.textTracks(), 'change', this.onTrackChangeHandler.bind(this));
     }
 
     ChromecastComponent.prototype.initializeApi = function() {
@@ -120,7 +119,7 @@
           mediaInfo.metadata.images = [image];
         }
       }
-      this.plTracks = this.player_.textTracks().tracks_;
+      this.plTracks = this.settings.tracks;
       if (this.plTracks) {
         this.tracks = [];
         ref1 = this.plTracks;
