@@ -130,8 +130,7 @@ class vjs.ChromecastComponent extends vjs.Button
     if @selectedTrack
       @activeTrackIds = [@selectedTrack.trackId];
       @tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest(@activeTrackIds);
-
-    @apiMedia.editTracksInfo(@tracksInfoRequest, @onTrackSuccess.bind(this), @onTrackError.bind(this));
+      @apiMedia.editTracksInfo(@tracksInfoRequest, @onTrackSuccess.bind(this), @onTrackError.bind(this));
 
     @startProgressTimer @incrementMediaTime.bind(this)
 

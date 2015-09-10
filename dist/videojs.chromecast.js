@@ -177,8 +177,8 @@
       if (this.selectedTrack) {
         this.activeTrackIds = [this.selectedTrack.trackId];
         this.tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest(this.activeTrackIds);
+        this.apiMedia.editTracksInfo(this.tracksInfoRequest, this.onTrackSuccess.bind(this), this.onTrackError.bind(this));
       }
-      this.apiMedia.editTracksInfo(this.tracksInfoRequest, this.onTrackSuccess.bind(this), this.onTrackError.bind(this));
       this.startProgressTimer(this.incrementMediaTime.bind(this));
       this.player_.loadTech('ChromecastTech', {
         receiver: this.apiSession.receiver.friendlyName
