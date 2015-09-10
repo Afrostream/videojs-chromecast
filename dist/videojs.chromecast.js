@@ -1,4 +1,4 @@
-/*! videojs-chromecast - v1.1.1 - 2015-09-09
+/*! videojs-chromecast - v1.1.1 - 2015-09-10
 * https://github.com/kim-company/videojs-chromecast
 * Copyright (c) 2015 KIM Keep In Mind GmbH, srl; Licensed MIT */
 
@@ -103,6 +103,7 @@
     ChromecastComponent.prototype.onSessionSuccess = function(session) {
       var image, key, loadRequest, mediaInfo, ref, ref1, value;
       vjs.log("Session initialized: " + session.sessionId);
+      this.selectedTrack = null;
       this.apiSession = session;
       this.addClass("connected");
       mediaInfo = new chrome.cast.media.MediaInfo(this.player_.currentSrc(), this.player_.currentType());
@@ -118,21 +119,25 @@
           mediaInfo.metadata.images = [image];
         }
       }
-      if (this.settings.tracks) {
+      this.plTracks = this.player_.textTracks().tracks_;
+      if (this.plTracks) {
         this.tracks = [];
-        ref1 = this.settings.tracks;
+        ref1 = this.plTracks;
         for (key in ref1) {
           value = ref1[key];
-          this.track = new chrome.cast.media.Track(1, chrome.cast.media.TrackType.TEXT);
-          this.track.trackContentId = value.src;
-          this.track.trackContentType = 'text/vtt';
-          this.track.subtype = chrome.cast.media.TextTrackType.SUBTITLES;
+          this.track = new chrome.cast.media.Track(value.id, chrome.cast.media.TrackType.TEXT);
+          this.track.trackContentId = value.id;
+          this.track.trackContentType = value.type;
+          this.track.subtype = value.kind;
           this.track.name = value.label;
-          this.track.language = value.srclang;
+          this.track.language = value.language;
+          if (this.track.language === this.settings.metadata.defaultLanguage) {
+            this.selectedTrack = this.track;
+          }
           this.track.customData = null;
           this.tracks.push(this.track);
         }
-        mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle;
+        mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle();
         mediaInfo.tracks = this.tracks;
       }
       loadRequest = new chrome.cast.media.LoadRequest(mediaInfo);
@@ -142,9 +147,38 @@
       return this.apiSession.addUpdateListener(this.onSessionUpdate.bind(this));
     };
 
+    ChromecastComponent.prototype.onTrackChangeHandler = function() {
+      var key, ref, value;
+      this.activeTrackIds = [];
+      ref = this.player_.textTracks();
+      for (key in ref) {
+        value = ref[key];
+        if (value['mode'] === 'showing') {
+          this.activeTrackIds.push(value.id);
+        }
+      }
+      this.tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest(this.activeTrackIds);
+      if (this.apiMedia) {
+        return this.apiMedia.editTracksInfo(this.tracksInfoRequest, this.onTrackSuccess.bind(this), this.onTrackError.bind(this));
+      }
+    };
+
+    ChromecastComponent.prototype.onTrackSuccess = function() {
+      return vjs.log('track added');
+    };
+
+    ChromecastComponent.prototype.onTrackError = function() {
+      return vjs.log('track error');
+    };
+
     ChromecastComponent.prototype.onMediaDiscovered = function(media) {
       this.apiMedia = media;
       this.apiMedia.addUpdateListener(this.onMediaStatusUpdate.bind(this));
+      if (this.selectedTrack) {
+        this.activeTrackIds = [this.selectedTrack.trackId];
+        this.tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest(this.activeTrackIds);
+      }
+      this.apiMedia.editTracksInfo(this.tracksInfoRequest, this.onTrackSuccess.bind(this), this.onTrackError.bind(this));
       this.startProgressTimer(this.incrementMediaTime.bind(this));
       this.player_.loadTech("ChromecastTech", {
         receiver: this.apiSession.receiver.friendlyName

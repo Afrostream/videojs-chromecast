@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html data-cast-api-enabled="true">
-  <head>
+<head>
     <title>Demo - VideoJS Chromecast Plugin</title>
 
     <!-- stylesheets -->
@@ -9,33 +9,41 @@
 
     <!-- javascripts -->
     <script src="http://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
-
     <script src="video.dev.js"></script>
     <script src="../dist/videojs.chromecast.js"></script>
-  </head>
-  <body>
-    <video id="demo_player" class="video-js vjs-default-skin" controls preload="auto" width="640" height="360"
-        poster="http://video-js.zencoder.com/oceans-clip.png"
-        data-setup="{}">
-      <source src="http://video-js.zencoder.com/oceans-clip.mp4" type="video/mp4">
-      <source src="http://video-js.zencoder.com/oceans-clip.webm" type="video/webm">
-      <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
-    </video>
-
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      videojs("demo_player", {
-        plugins: {
-          chromecast: {
-            appId: undefined,
-            metadata: {
-              title: "Title",
-              subtitle: "Subtitle"
-            }
-          }
-        }
-      });
-    });
+        videojs.options.techOrder = ['flash'];
     </script>
-  </body>
+</head>
+<body>
+<video crossorigin id="demo_player" class="video-js vjs-default-skin" controls preload="auto" width="640"
+       height="360"
+       poster="http://video-js.zencoder.com/oceans-clip.png"
+       data-setup="{}">
+    <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
+    <track kind="captions" src="http://www.videojs.com/vtt/captions.vtt" srclang="en" label="English"></track>
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a
+            href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+</video>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        videojs("demo_player", {
+            plugins: {
+                chromecast: {
+                    appId: undefined,
+                    metadata: {
+                        title: "Title",
+                        subtitle: "Subtitle",
+                        defaultLanguage:'en'
+                    },
+                    tracks:[
+                        {src:''}
+                    ]
+                }
+            }
+        });
+    });
+</script>
+</body>
 </html>

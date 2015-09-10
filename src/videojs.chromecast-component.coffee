@@ -62,7 +62,7 @@ class vjs.ChromecastComponent extends vjs.Button
 
   onSessionSuccess: (session) ->
     vjs.log "Session initialized: #{session.sessionId}"
-
+    @selectedTrack = null;
     @apiSession = session
     @addClass "connected"
 
@@ -78,19 +78,24 @@ class vjs.ChromecastComponent extends vjs.Button
         image = new chrome.cast.Image(@player_.options_.poster)
         mediaInfo.metadata.images = [image]
 
-    if @settings.tracks
+    @plTracks = @player_.textTracks().tracks_;
+    if @plTracks
       @tracks = [];
-      for key, value of @settings.tracks
-        @track = new chrome.cast.media.Track(1, chrome.cast.media.TrackType.TEXT);
-        @track.trackContentId = value.src;
-        @track.trackContentType = 'text/vtt';
-        @track.subtype = chrome.cast.media.TextTrackType.SUBTITLES;
+      for key, value of @plTracks
+        @track = new chrome.cast.media.Track(value.id, chrome.cast.media.TrackType.TEXT);
+        @track.trackContentId = value.id;
+        @track.trackContentType = value.type; #'text/vtt';
+        @track.subtype = value.kind #chrome.cast.media.TextTrackType.CAPTIONS;
         @track.name = value.label;
-        @track.language = value.srclang;
+        @track.language = value.language;
+        if @track.language is @settings.metadata.defaultLanguage
+          @selectedTrack = @track;
         @track.customData = null;
         @tracks.push(@track);
-      mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle;
+
+      mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle();
       mediaInfo.tracks = @tracks;
+
 
     loadRequest = new chrome.cast.media.LoadRequest(mediaInfo)
     loadRequest.autoplay = true
@@ -99,9 +104,32 @@ class vjs.ChromecastComponent extends vjs.Button
     @apiSession.loadMedia loadRequest, @onMediaDiscovered.bind(this), @castError
     @apiSession.addUpdateListener @onSessionUpdate.bind(this)
 
+  onTrackChangeHandler: () ->
+    @activeTrackIds = [];
+    for key, value of @player_.textTracks()
+      if value['mode'] is 'showing'
+        @activeTrackIds.push(value.id);
+
+    @tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest(@activeTrackIds);
+
+    if(@apiMedia)
+      @apiMedia.editTracksInfo(@tracksInfoRequest, @onTrackSuccess.bind(this), @onTrackError.bind(this));
+
+  onTrackSuccess: () ->
+    vjs.log('track added');
+
+  onTrackError: () ->
+    vjs.log('track error');
+
   onMediaDiscovered: (media) ->
     @apiMedia = media
     @apiMedia.addUpdateListener @onMediaStatusUpdate.bind(this)
+
+    if @selectedTrack
+      @activeTrackIds = [@selectedTrack.trackId];
+      @tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest(@activeTrackIds);
+
+    @apiMedia.editTracksInfo(@tracksInfoRequest, @onTrackSuccess.bind(this), @onTrackError.bind(this));
 
     @startProgressTimer @incrementMediaTime.bind(this)
 
