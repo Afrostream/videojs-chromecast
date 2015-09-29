@@ -64,13 +64,8 @@
         return;
       }
       if (!chrome.cast || !chrome.cast.isAvailable) {
-        vjs.log("Cast APIs not available. Retrying...");
-        if (this.tryingReconnect < 3) {
-          setTimeout(this.initializeApi.bind(this), 1000);
-          vjs.log("Cast APIs not available. Max reconnect attempt");
-          ++this.tryingReconnect;
-          return;
-        }
+        vjs.log("Cast APIs not available");
+        return;
       }
       vjs.log("Cast APIs are available");
       appId = this.settings.appId || chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID;
