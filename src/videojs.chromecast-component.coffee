@@ -14,6 +14,7 @@ class vjs.ChromecastComponent extends vjs.Button
 
   timer: null
   timerStep: 1000
+  tryingReconnect:0
 
   constructor: (player, @settings) ->
     super player, @settings
@@ -29,8 +30,12 @@ class vjs.ChromecastComponent extends vjs.Button
     # If the Cast APIs arent available yet, retry in 1000ms
     if not chrome.cast or not chrome.cast.isAvailable
       vjs.log "Cast APIs not available. Retrying..."
-      setTimeout @initializeApi.bind(@), 1000
-      return
+
+      if @tryingReconnect < 3
+        setTimeout @initializeApi.bind(@), 1000
+        vjs.log "Cast APIs not available. Max reconnect attempt"
+        ++@tryingReconnect
+        return
 
     vjs.log "Cast APIs are available"
 
