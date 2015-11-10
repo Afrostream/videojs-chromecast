@@ -4,6 +4,7 @@ class vjs.ChromecastTech extends vjs.MediaTechController
 
   @canPlaySource = (source) ->
     source.type is "video/mp4" or
+    source.type is "application/dash+xml" or
     source.type is "video/webm" or
     source.type is "application/x-mpegURL" or
     source.type is "application/vnd.apple.mpegURL"
